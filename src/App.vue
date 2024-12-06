@@ -53,6 +53,24 @@
                 <p class="text-sm font-medium text-gray-900">{{ currentUser.username }}</p>
                 <p class="text-xs text-gray-500">{{ getRoleName(currentUser.role) }}</p>
               </div>
+              <!-- Switch Role -->
+              <div class="px-4 py-2 border-b">
+                <p class="text-xs text-gray-500 mb-2">Promeni ulogu</p>
+                <div class="flex items-center space-x-2">
+                  <button @click="switchRole('waiter')"
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200" :class="currentUser.role === 'waiter'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-600 hover:bg-green-50'">
+                    Konobar
+                  </button>
+                  <button @click="switchRole('bartender')"
+                    class="px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200" :class="currentUser.role === 'bartender'
+                      ? 'bg-purple-100 text-purple-700'
+                      : 'bg-gray-100 text-gray-600 hover:bg-purple-50'">
+                    Šanker
+                  </button>
+                </div>
+              </div>
               <button @click="logout" class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                 <svg class="mr-3 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -288,6 +306,18 @@ const logout = () => {
   // Redirect to home if logged out from admin
   if (isAdminRoute.value) {
     window.location.href = '/'
+  }
+}
+
+const switchRole = (newRole) => {
+  if (currentUser.value) {
+    currentUser.value = {
+      ...currentUser.value,
+      role: newRole
+    }
+    activeTab.value = 'menu' // Reset na meni tab pri promeni uloge
+    isProfileMenuOpen.value = false
+    showNotification(`Uloga promenjena na: ${getRoleName(newRole)}`)
   }
 }
 
