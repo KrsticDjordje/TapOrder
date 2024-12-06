@@ -1,23 +1,17 @@
 <template>
-  <div>
-    <h2 class="text-xl font-semibold mb-4">Stolovi</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-      <TableItem
-        v-for="table in tables"
-        :key="table.id"
-        :table="table"
-        :order="getTableOrder(table.id)"
-        @view-order="viewOrder"
-      />
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+    <div v-for="table in tables" :key="table.id"
+      class="relative bg-white rounded-2xl shadow-sm cursor-pointer group hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+      :class="{
+        'ring-2 ring-green-500 bg-green-50': table.status === 'Slobodan',
+        'ring-2 ring-red-500 bg-red-50': table.status === 'Zauzet'
+      }">
+      <TableItem :table="table" :order="getTableOrder(table.id)" @view-order="viewOrder" />
     </div>
-
-    <OrderModal
-      v-if="selectedOrder"
-      :order="selectedOrder"
-      @close="closeOrderModal"
-      @complete="completeOrder"
-    />
   </div>
+
+  <OrderModal v-if="selectedOrder" :table="{ id: selectedOrder?.tableId }" :order="selectedOrder"
+    @close="closeOrderModal" @complete-order="handleOrderComplete" />
 </template>
 
 <script setup>
@@ -40,22 +34,22 @@ const emit = defineEmits(['order-completed'])
 
 const selectedOrder = ref(null)
 
-const getTableOrder = (tableId) => {
-  return props.orders.find(o => o.tableId === tableId && o.status === 'Nova')
-}
-
 const viewOrder = (tableId) => {
-  selectedOrder.value = getTableOrder(tableId)
+  const order = getTableOrder(tableId)
+  if (order) {
+    selectedOrder.value = order
+  }
 }
 
 const closeOrderModal = () => {
   selectedOrder.value = null
 }
 
-const completeOrder = () => {
-  if (selectedOrder.value) {
-    emit('order-completed', selectedOrder.value.id)
-    closeOrderModal()
-  }
+const handleOrderComplete = (orderId) => {
+  emit('order-completed', orderId)
 }
-</script> 
+
+const getTableOrder = (tableId) => {
+  return props.orders.find(o => o.tableId === tableId && o.status !== 'Završena')
+}
+</script>

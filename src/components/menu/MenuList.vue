@@ -5,14 +5,27 @@
       <div class="mb-6">
 
         <!-- Search Bar -->
-        <div class="relative mb-6">
-          <input v-model="searchQuery" type="text" placeholder="Search..."
-            class="w-full pl-12 pr-4 py-3.5 bg-gray-50 rounded-xl text-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-all duration-200">
-          <svg class="absolute left-4 top-4 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+        <div class="relative mb-6 mx-auto max-w-md">
+          <div class="relative">
+            <input v-model="searchQuery" type="text" placeholder="Pretraži proizvode..." class="w-full pl-12 pr-4 py-4 bg-white rounded-2xl border border-gray-200 text-gray-900 text-sm 
+                placeholder-gray-500 shadow-sm outline-none transition-all duration-300 ease-in-out
+                focus:border-green-500 focus:shadow-green-glow"
+              :class="{ 'border-green-500 shadow-green-glow': searchQuery }">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 transition-colors duration-300"
+                :class="searchQuery ? 'text-green-500' : 'text-gray-400'" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <button v-if="searchQuery" @click="searchQuery = ''" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-green-500
+                transition-colors duration-300">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Categories -->
@@ -93,7 +106,7 @@ const props = defineProps({
 const emit = defineEmits(['order-placed'])
 
 const currentView = ref('home')
-const categories = ['Sve', 'Kafa', 'Čaj', 'Sokovi', 'Ostalo']
+const categories = ['Sve', 'Kafa', 'Čaj', 'Sokovi']
 const selectedCategory = ref('Sve')
 const sortBy = ref('name')
 const searchQuery = ref('')
@@ -152,7 +165,7 @@ const removeFromCart = (item) => {
 const handlePlaceOrder = () => {
   const order = {
     items: [...cart.value],
-    tableId: Math.floor(Math.random() * 6) + 1,
+    tableId: 1,
     status: 'Nova'
   }
   emit('order-placed', order)
@@ -206,5 +219,19 @@ const showProductDetails = (product) => {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
+}
+
+/* Custom shadow za fokusirani input */
+.shadow-green-glow {
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+}
+
+/* Animacija za input */
+input {
+  transform-origin: center;
+}
+
+input:focus {
+  transform: scale(1.01);
 }
 </style>

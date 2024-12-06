@@ -6,7 +6,11 @@
         <div class="flex items-center justify-between">
           <!-- Logo and Title -->
 
-          <div class="flex items-center justify-between mb-4 w-full">
+          <div class="flex items-center mb-4 w-full">
+            <div class="flex-shrink-0 mr-4">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMXr9BT4QnxAkvTz0eacWGaoMYdQQb37EYMQ&s"
+                alt="Logo" class="h-12 w-15 rounded-lg">
+            </div>
             <div>
               <h1 class="text-2xl font-semibold text-gray-900">Hi {{ currentUser?.username }}</h1>
               <p class="text-gray-500">Enjoy in TapOrder 🔥</p>
@@ -44,7 +48,7 @@
 
             <!-- Profile Dropdown -->
             <div v-if="isProfileMenuOpen"
-              class="absolute right-0 mt-2 w-48 rounded-xl bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+              class="absolute right-0 mt-2 w-48 rounded-xl bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 z-10">
               <div class="px-4 py-2 border-b">
                 <p class="text-sm font-medium text-gray-900">{{ currentUser.username }}</p>
                 <p class="text-xs text-gray-500">{{ getRoleName(currentUser.role) }}</p>
@@ -247,8 +251,11 @@ const menuItems = [
 
 const tables = ref([
   { id: 1, status: 'Slobodan' },
-  { id: 2, status: 'Zauzet' },
-  // ... ostali stolovi
+  { id: 2, status: 'Slobodan' },
+  { id: 3, status: 'Slobodan' },
+  { id: 4, status: 'Slobodan' },
+  { id: 5, status: 'Slobodan' },
+  { id: 6, status: 'Slobodan' }
 ])
 
 const orders = ref([])
@@ -283,6 +290,8 @@ const logout = () => {
 
 const handleOrderPlaced = (order) => {
   order.id = nextOrderId++
+  order.status = 'Nova'
+  order.createdAt = new Date().toISOString()
   orders.value.push(order)
   const tableIndex = tables.value.findIndex(t => t.id === order.tableId)
   if (tableIndex !== -1) {
