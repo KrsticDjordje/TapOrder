@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-20">
+  <div class="pb-10">
     <div v-if="currentView === 'home'">
       <!-- Header Section -->
       <div class="mb-6">
@@ -166,7 +166,9 @@ const handlePlaceOrder = () => {
   const order = {
     items: [...cart.value],
     tableId: 1,
-    status: 'Nova'
+    status: 'Nova',
+    createdAt: new Date().toISOString(),
+    type: 'drink'
   }
   emit('order-placed', order)
   cart.value = []

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
+    <header class="bg-white">
       <div class="px-4 py-3">
         <div class="flex items-center justify-between">
           <!-- Logo and Title -->
@@ -82,17 +82,17 @@
         <LoginForm v-if="!isLoggedIn" @login="handleAdminLogin" />
 
         <template v-else>
-          <template v-if="currentUser.role === 'waiter'">
+          <template v-if="currentUser.role === 'waiter' || currentUser.role === 'bartender'">
             <div v-show="activeTab === 'menu'">
               <MenuList :menu-items="menuItems" @order-placed="handleOrderPlaced" />
             </div>
-            <div v-show="activeTab === 'tables'">
+            <div v-show="activeTab === 'tables' && currentUser.role === 'waiter'">
               <TableList :tables="tables" :orders="orders" @order-completed="handleOrderCompleted" />
             </div>
+            <div v-show="activeTab === 'tables' && currentUser.role === 'bartender'">
+              <OrderList :orders="orders" @order-completed="handleOrderCompleted" />
+            </div>
           </template>
-
-          <OrderList v-else-if="currentUser.role === 'bartender'" :orders="orders"
-            @order-completed="handleOrderCompleted" />
         </template>
       </template>
 
@@ -100,7 +100,7 @@
     </main>
 
     <!-- Bottom Navigation Bar za konobara -->
-    <div v-if="isLoggedIn && currentUser.role === 'waiter'"
+    <div v-if="isLoggedIn && (currentUser.role === 'waiter' || currentUser.role === 'bartender')"
       class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
       <div class="flex justify-around items-center">
         <button @click="activeTab = 'menu'" class="flex flex-col items-center px-4 py-2 rounded-lg"
@@ -115,9 +115,12 @@
         <button @click="activeTab = 'tables'" class="flex flex-col items-center px-4 py-2 rounded-lg"
           :class="activeTab === 'tables' ? 'text-green-600' : 'text-gray-600'">
           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              :d="currentUser.role === 'waiter'
+                ? 'M4 6h16M4 10h16M4 14h16M4 18h16'
+                : 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'" />
           </svg>
-          <span class="text-sm mt-1">Stolovi</span>
+          <span class="text-sm mt-1">{{ currentUser.role === 'waiter' ? 'Stolovi' : 'Porudžbine' }}</span>
         </button>
       </div>
     </div>
@@ -292,21 +295,27 @@ const handleOrderPlaced = (order) => {
   order.id = nextOrderId++
   order.status = 'Nova'
   order.createdAt = new Date().toISOString()
+  order.type = 'drink'
   orders.value.push(order)
   const tableIndex = tables.value.findIndex(t => t.id === order.tableId)
   if (tableIndex !== -1) {
     tables.value[tableIndex].status = 'Zauzet'
   }
   showNotification('Narudžbina uspešno poslata!')
+  console.log('Nova porudžbina:', order)
+  console.log('Sve porudžbine:', orders.value)
 }
 
-const handleOrderCompleted = (orderId) => {
+const handleOrderCompleted = ({ orderId, newStatus }) => {
   const orderIndex = orders.value.findIndex(o => o.id === orderId)
   if (orderIndex !== -1) {
-    orders.value[orderIndex].status = 'Završena'
-    const tableIndex = tables.value.findIndex(t => t.id === orders.value[orderIndex].tableId)
-    if (tableIndex !== -1) {
-      tables.value[tableIndex].status = 'Slobodan'
+    orders.value[orderIndex].status = newStatus
+    if (newStatus === 'Završena') {
+      // Oslobađamo sto samo kad je porudžbina završena
+      const tableIndex = tables.value.findIndex(t => t.id === orders.value[orderIndex].tableId)
+      if (tableIndex !== -1) {
+        tables.value[tableIndex].status = 'Slobodan'
+      }
     }
   }
 }
