@@ -4,28 +4,18 @@
     <form @submit.prevent="handleSubmit" class="space-y-4">
       <div>
         <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-        <input
-          type="text"
-          id="username"
-          v-model="username"
+        <input type="text" id="username" v-model="username"
           class="w-full px-4 py-3 rounded-xl border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-          required
-        >
+          required>
       </div>
       <div>
         <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <input
-          type="password"
-          id="password"
-          v-model="password"
+        <input type="password" id="password" v-model="password"
           class="w-full px-4 py-3 rounded-xl border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-          required
-        >
+          required>
       </div>
-      <button 
-        type="submit" 
-        class="w-full bg-green-600 text-white py-3 rounded-xl font-medium hover:bg-green-700 transition-colors duration-200 flex items-center justify-center space-x-2"
-      >
+      <button type="submit"
+        class="w-full bg-green-600 text-white py-3 rounded-xl font-medium hover:bg-green-700 transition-colors duration-200 flex items-center justify-center space-x-2">
         <span>Login</span>
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -38,17 +28,32 @@
 <script setup>
 import { ref, defineEmits } from 'vue'
 
-const emit = defineEmits(['login'])
 const username = ref('')
 const password = ref('')
 
+// Mock korisnici za testiranje
+const users = [
+  { username: 'waiter', password: '123', role: 'waiter' },
+  { username: 'bartender', password: '123', role: 'bartender' }
+]
+
+const emit = defineEmits(['login'])
+
 const handleSubmit = () => {
-  if (username.value === 'waiter' || username.value === 'bartender') {
-    emit('login', { username: username.value, role: username.value })
+  const user = users.find(u =>
+    u.username === username.value &&
+    u.password === password.value
+  )
+
+  if (user) {
+    emit('login', {
+      username: user.username,
+      role: user.role
+    })
     username.value = ''
     password.value = ''
   } else {
-    alert('Invalid username or password')
+    alert('Pogrešno korisničko ime ili lozinka')
   }
 }
 </script>
@@ -65,4 +70,4 @@ input {
 input:focus {
   @apply outline-none;
 }
-</style> 
+</style>

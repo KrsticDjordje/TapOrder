@@ -5,12 +5,29 @@
       <div class="px-4 py-3">
         <div class="flex items-center justify-between">
           <!-- Logo and Title -->
-          <div class="flex items-center space-x-3">
+
+          <div class="flex items-center justify-between mb-4 w-full">
+            <div>
+              <h1 class="text-2xl font-semibold text-gray-900">Hi {{ currentUser?.username }}</h1>
+              <p class="text-gray-500">Enjoy in TapOrder 🔥</p>
+            </div>
+            <!-- <div class="relative">
+              <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                <span class="absolute top-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                <img src="https://t3.ftcdn.net/jpg/02/22/85/16/360_F_222851624_jfoMGbJxwRi5AWGdPgXKSABMnzCQo9RN.jpg"
+                  alt="Profile" class="w-8 h-8 rounded-full">
+              </button>
+            </div> -->
+          </div>
+
+
+          <!-- <div class="flex items-center space-x-3">
             <div class="flex-shrink-0">
-              <img src="/logo.png" alt="Logo" class="h-8 w-8 rounded-lg">
+              <img src="https://t3.ftcdn.net/jpg/02/22/85/16/360_F_222851624_jfoMGbJxwRi5AWGdPgXKSABMnzCQo9RN.jpg"
+                alt="Logo" class="h-8 w-8 rounded-lg">
             </div>
             <h1 class="text-lg font-semibold text-gray-900">Kod Programera</h1>
-          </div>
+          </div> -->
 
           <!-- Profile Menu - samo za admin korisnike -->
           <div v-if="isAdminUser" class="relative">
@@ -56,13 +73,19 @@
     </header>
 
     <!-- Main Content -->
-    <main class="p-4">
+    <main class="p-4 pb-20">
       <template v-if="isAdminRoute">
         <LoginForm v-if="!isLoggedIn" @login="handleAdminLogin" />
 
         <template v-else>
-          <TableList v-if="currentUser.role === 'waiter'" :tables="tables" :orders="orders"
-            @order-completed="handleOrderCompleted" />
+          <template v-if="currentUser.role === 'waiter'">
+            <div v-show="activeTab === 'menu'">
+              <MenuList :menu-items="menuItems" @order-placed="handleOrderPlaced" />
+            </div>
+            <div v-show="activeTab === 'tables'">
+              <TableList :tables="tables" :orders="orders" @order-completed="handleOrderCompleted" />
+            </div>
+          </template>
 
           <OrderList v-else-if="currentUser.role === 'bartender'" :orders="orders"
             @order-completed="handleOrderCompleted" />
@@ -71,6 +94,29 @@
 
       <MenuList v-else :menu-items="menuItems" @order-placed="handleOrderPlaced" />
     </main>
+
+    <!-- Bottom Navigation Bar za konobara -->
+    <div v-if="isLoggedIn && currentUser.role === 'waiter'"
+      class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+      <div class="flex justify-around items-center">
+        <button @click="activeTab = 'menu'" class="flex flex-col items-center px-4 py-2 rounded-lg"
+          :class="activeTab === 'menu' ? 'text-green-600' : 'text-gray-600'">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span class="text-sm mt-1">Meni</span>
+        </button>
+
+        <button @click="activeTab = 'tables'" class="flex flex-col items-center px-4 py-2 rounded-lg"
+          :class="activeTab === 'tables' ? 'text-green-600' : 'text-gray-600'">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          </svg>
+          <span class="text-sm mt-1">Stolovi</span>
+        </button>
+      </div>
+    </div>
 
     <NotificationMessage :show="notificationVisible" :message="notificationMessage" />
   </div>
@@ -91,6 +137,9 @@ const notificationVisible = ref(false)
 const notificationMessage = ref('')
 const isProfileMenuOpen = ref(false)
 const isAdminRoute = ref(false)
+
+// Dodajemo novi ref za aktivni tab
+const activeTab = ref('menu')
 
 // Computed properties
 const isAdminUser = computed(() => {
