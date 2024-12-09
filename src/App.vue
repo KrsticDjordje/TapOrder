@@ -12,8 +12,8 @@
                 alt="Logo" class="h-12 w-15 rounded-lg">
             </div>
             <div>
-              <h1 class="text-2xl font-semibold text-gray-900">Hi {{ currentUser?.username }}</h1>
-              <p class="text-gray-500">Enjoy in TapOrder 🔥</p>
+              <h1 class="text-2xl font-semibold text-gray-900">Hi, {{ currentUser?.username }}</h1>
+              <p class="text-gray-500">Enjoy in TapOrder </p>
             </div>
             <!-- <div class="relative">
               <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -24,6 +24,15 @@
             </div> -->
           </div>
 
+          <!-- Nova ikonica za korisnika -->
+          <div class="flex items-center">
+            <button @click="navigateToAdmin"
+              class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+              <img
+                src="https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI="
+                alt="User Icon" class="w-8 h-8 rounded-full">
+            </button>
+          </div>
 
           <!-- <div class="flex items-center space-x-3">
             <div class="flex-shrink-0">
@@ -356,6 +365,11 @@ const showNotification = (message) => {
   setTimeout(() => {
     notificationVisible.value = false
   }, 3000)
+}
+
+// Dodajte ovu funkciju za navigaciju
+const navigateToAdmin = () => {
+  window.location.href = '/admin'
 }
 </script>
 
